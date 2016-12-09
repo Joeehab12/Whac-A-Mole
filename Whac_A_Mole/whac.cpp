@@ -422,13 +422,47 @@ int main( void )
 
         // MVP & drawing for hammer
         //***************************
+	
+		
+	//Code for Linking Mouse Motion with Hammer
+        //***************************
+        static double lastTime = glfwGetTime();
+
+        float mouseSpeed = 3.0f;
+        double currentTime = glfwGetTime();
+        float deltaTime = float(currentTime - lastTime);
+        int xpos,ypos;
+        glfwGetMousePos(&xpos, &ypos);
+        float xhammer,yhammer;
+        xhammer =  (1024/2-xpos)*deltaTime*mouseSpeed;
+        yhammer =  (768/2-ypos)*deltaTime*mouseSpeed;
+        if (xhammer < -2){
+            xhammer = -2.0f;
+            glfwSetMousePos(1024/2-xhammer/(deltaTime*mouseSpeed),ypos);
+        }
+        else if (xhammer > 9){
+            xhammer = 9.0f;
+            glfwSetMousePos(1024/2-xhammer/(deltaTime*mouseSpeed),ypos);
+        }
+        else if (yhammer > 8){
+            yhammer = 8.0f;
+            glfwSetMousePos(xpos,768/2-yhammer/(deltaTime*mouseSpeed));
+        }
+        else if (yhammer <-6){
+            yhammer = -6.0f;
+            glfwSetMousePos(xpos,768/2-yhammer/(deltaTime*mouseSpeed));
+        }
+
+
 
         glm::mat4 RotationMatrix_Hammer = eulerAngleYXZ(0.0f,0.0f,1.0f);
-        glm::mat4 TranslationMatrix_Hammer = translate(mat4(), vec3(6.0f, 3.0f, -9.0f));
+        glm::mat4 TranslationMatrix_Hammer = translate(mat4(), vec3(6.0f - xhammer, 3.0f, -9.0f - yhammer));
         glm::mat4 ScalingMatrix_Hammer = scale(mat4(), vec3(0.06f, 0.06f, 0.06f));
         glm::mat4 ModelMatrix_Hammer = TranslationMatrix_Hammer * RotationMatrix_Hammer * ScalingMatrix_Hammer;
 
+
         glm::mat4 MVP_Hammer = ProjectionMatrix * ViewMatrix * ModelMatrix_Hammer;
+        
 
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP_Hammer[0][0]);
         glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix_Hammer[0][0]);
