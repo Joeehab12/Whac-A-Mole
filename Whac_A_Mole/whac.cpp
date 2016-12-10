@@ -53,6 +53,7 @@ int main( void )
 
     // Ensure we can capture the escape key being pressed below
     glfwEnable( GLFW_STICKY_KEYS );
+
     glfwSetMousePos(1024/2, 768/2);
 
     // Dark blue background
@@ -423,7 +424,6 @@ int main( void )
         // MVP & drawing for hammer
         //***************************
 
-
         // Code for Linking Mouse Motion with Hammer
         // ***************************
 
@@ -482,13 +482,14 @@ int main( void )
 
         //glm::mat4 RotationMatrix_Hammer = eulerAngleYXZ(0.0f,0.0f,1.0f);
         //glm::mat4 TranslationMatrix_Hammer = translate(mat4(), vec3(6.0f, 3.0f, -9.0f));
+
         glm::mat4 ScalingMatrix_Hammer = scale(mat4(), vec3(0.06f, 0.06f, 0.06f));
         glm::mat4 ModelMatrix_Hammer = TranslationMatrix_Hammer * RotationMatrix_Hammer * ScalingMatrix_Hammer;
 
 
         glm::mat4 MVP_Hammer = ProjectionMatrix * ViewMatrix * ModelMatrix_Hammer;
 
-
+        //*************************************************
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP_Hammer[0][0]);
         glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix_Hammer[0][0]);
         glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
@@ -501,6 +502,7 @@ int main( void )
         // 1rst attribute buffer : vertices
         glEnableVertexAttribArray(vertexPosition_modelspaceID);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer_hammer);
+
         glVertexAttribPointer(
             vertexPosition_modelspaceID,  // The attribute we want to configure
             3,                            // size
@@ -512,6 +514,7 @@ int main( void )
 
         // 2nd attribute buffer : UVs
         glEnableVertexAttribArray(vertexUVID);
+
         glBindBuffer(GL_ARRAY_BUFFER, uvbuffer_hammer);
         glVertexAttribPointer(
             vertexUVID,                   // The attribute we want to configure
@@ -548,6 +551,7 @@ int main( void )
     } // Check if the ESC key was pressed or the window was closed
     while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS &&
            glfwGetWindowParam( GLFW_OPENED ) );
+
 
     // Cleanup VBO and shader
     glDeleteProgram(programID);
