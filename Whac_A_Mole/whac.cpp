@@ -24,60 +24,61 @@ using namespace glm;
 
 int main( void )
 {
-	// Initialise GLFW
-	if( !glfwInit() )
-	{
-		fprintf( stderr, "Failed to initialize GLFW\n" );
-		return -1;
-	}
+    // Initialise GLFW
+    if( !glfwInit() )
+    {
+        fprintf( stderr, "Failed to initialize GLFW\n" );
+        return -1;
+    }
 
-	glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 2);
-	glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 1);
+    glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
+    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 2);
+    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 1);
 
-	// Open a window and create its OpenGL context
-	if( !glfwOpenWindow( 1024, 768, 0,0,0,0, 32,0, GLFW_WINDOW ) )
-	{
-		fprintf( stderr, "Failed to open GLFW window.\n" );
-		glfwTerminate();
-		return -1;
-	}
+    // Open a window and create its OpenGL context
+    if( !glfwOpenWindow( 1024, 768, 0,0,0,0, 32,0, GLFW_WINDOW ) )
+    {
+        fprintf( stderr, "Failed to open GLFW window.\n" );
+        glfwTerminate();
+        return -1;
+    }
 
-	// Initialize GLEW
-	if (glewInit() != GLEW_OK) {
-		fprintf(stderr, "Failed to initialize GLEW\n");
-		return -1;
-	}
+    // Initialize GLEW
+    if (glewInit() != GLEW_OK) {
+        fprintf(stderr, "Failed to initialize GLEW\n");
+        return -1;
+    }
 
     glfwSetWindowTitle( "Whac-A-Mole" );
 
-	// Ensure we can capture the escape key being pressed below
-	glfwEnable( GLFW_STICKY_KEYS );
+    // Ensure we can capture the escape key being pressed below
+    glfwEnable( GLFW_STICKY_KEYS );
+
     glfwSetMousePos(1024/2, 768/2);
 
-	// Dark blue background
-	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+    // Dark blue background
+    glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
-	// Enable depth test
-	glEnable(GL_DEPTH_TEST);
-	// Accept fragment if it closer to the camera than the former one
-	glDepthFunc(GL_LESS); 
+    // Enable depth test
+    glEnable(GL_DEPTH_TEST);
+    // Accept fragment if it closer to the camera than the former one
+    glDepthFunc(GL_LESS);
 
-	// Cull triangles which normal is not towards the camera
-	glEnable(GL_CULL_FACE);
+    // Cull triangles which normal is not towards the camera
+    glEnable(GL_CULL_FACE);
 
-	// Create and compile our GLSL program from the shaders
-	GLuint programID = LoadShaders( "StandardShading.vertexshader", "StandardShading.fragmentshader" );
+    // Create and compile our GLSL program from the shaders
+    GLuint programID = LoadShaders( "StandardShading.vertexshader", "StandardShading.fragmentshader" );
 
-	// Get a handle for our "MVP" uniform
-	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-	GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
-	GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
+    // Get a handle for our "MVP" uniform
+    GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+    GLuint ViewMatrixID = glGetUniformLocation(programID, "V");
+    GLuint ModelMatrixID = glGetUniformLocation(programID, "M");
 
-	// Get a handle for our buffers
-	GLuint vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
-	GLuint vertexUVID = glGetAttribLocation(programID, "vertexUV");
-	GLuint vertexNormal_modelspaceID = glGetAttribLocation(programID, "vertexNormal_modelspace");
+    // Get a handle for our buffers
+    GLuint vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
+    GLuint vertexUVID = glGetAttribLocation(programID, "vertexUV");
+    GLuint vertexNormal_modelspaceID = glGetAttribLocation(programID, "vertexNormal_modelspace");
 
     // Load the textures for each model
     //***************************
@@ -88,8 +89,8 @@ int main( void )
     GLuint Texture_Hammer = loadBMP_custom("hammer.bmp");
 
     //***************************
-	
-	// Get a handle for our "myTextureSampler" uniform
+
+    // Get a handle for our "myTextureSampler" uniform
     GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 
     // Read Table obj file
@@ -212,17 +213,17 @@ int main( void )
 
     //***************************
 
-	// Get a handle for our "LightPosition" uniform
+    // Get a handle for our "LightPosition" uniform
     glUseProgram(programID);
-	GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
+    GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
 
-	do{
+    do{
 
-		// Clear the screen
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // Clear the screen
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Use our shader
-		glUseProgram(programID);
+        // Use our shader
+        glUseProgram(programID);
 
         glm::vec3 lightPos = glm::vec3(0,9,-8);
         glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
@@ -423,35 +424,65 @@ int main( void )
         // MVP & drawing for hammer
         //***************************
 
-        //Code for Linking Mouse Motion with Hammer
-        //***************************
+        // Code for Linking Mouse Motion with Hammer
+        // ***************************
 
         glfwDisable(GLFW_MOUSE_CURSOR);
-        float mouseSpeed = 0.015f;
+
+        float mouseSpeed = 0.03f;
+
         int xpos,ypos;
+
         glfwGetMousePos(&xpos, &ypos);
+
         float xhammer,yhammer;
-        xhammer =  float(1024/2-xpos)*mouseSpeed;
-        yhammer =  float(768/2-ypos)*mouseSpeed;
-        if (xhammer < -2){
-            xhammer = -2.0f;
-            glfwSetMousePos(1024/2-xhammer/(mouseSpeed),ypos);
+
+        xhammer =  (1024/2-xpos)*mouseSpeed;
+        yhammer =  (768/2-ypos)*mouseSpeed;
+
+        if (xhammer < -6)
+        {
+            xhammer = -6.0f;
+            glfwSetMousePos(1024/2-xhammer/mouseSpeed,ypos);
         }
-        else if (xhammer > 9){
-            xhammer = 9.0f;
-            glfwSetMousePos(1024/2-xhammer/(mouseSpeed),ypos);
+        else if (xhammer > 6)
+        {
+            xhammer = 6.0f;
+            glfwSetMousePos(1024/2-xhammer/mouseSpeed,ypos);
         }
-        else if (yhammer > 8){
+        else if (yhammer > 8)
+        {
             yhammer = 8.0f;
-            glfwSetMousePos(xpos,768/2-yhammer/(mouseSpeed));
+            glfwSetMousePos(xpos,768/2-yhammer/mouseSpeed);
         }
-        else if (yhammer <-6){
+        else if (yhammer <-6)
+        {
             yhammer = -6.0f;
-            glfwSetMousePos(xpos,768/2-yhammer/(mouseSpeed));
+            glfwSetMousePos(xpos,768/2-yhammer/mouseSpeed);
         }
 
-        glm::mat4 RotationMatrix_Hammer = eulerAngleYXZ(0.0f,0.0f,1.0f);
-        glm::mat4 TranslationMatrix_Hammer = translate(mat4(), vec3(6.0f - xhammer, 3.0f, -9.0f - yhammer));
+        glm::mat4 TranslationMatrix_Hammer = translate(mat4(), vec3(4.0f - xhammer, 3.0f, -6.0f - yhammer));
+
+        // ***************************
+
+        // Rotation of Hammer when Smacking
+        // ***************************
+
+        glm::mat4 RotationMatrix_Hammer;
+
+        if (glfwGetMouseButton(GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+        {
+            RotationMatrix_Hammer = eulerAngleYXZ(-0.5f, 0.0f, 1.5f);
+            TranslationMatrix_Hammer = translate(mat4(), vec3(4.0f - xhammer, 4.2f, -6.0f - yhammer));
+        }
+        else
+            RotationMatrix_Hammer = eulerAngleYXZ(-0.5f,0.0f,1.0f);
+
+        // ***************************
+
+        //glm::mat4 RotationMatrix_Hammer = eulerAngleYXZ(0.0f,0.0f,1.0f);
+        //glm::mat4 TranslationMatrix_Hammer = translate(mat4(), vec3(6.0f, 3.0f, -9.0f));
+
         glm::mat4 ScalingMatrix_Hammer = scale(mat4(), vec3(0.06f, 0.06f, 0.06f));
         glm::mat4 ModelMatrix_Hammer = TranslationMatrix_Hammer * RotationMatrix_Hammer * ScalingMatrix_Hammer;
 
@@ -461,64 +492,68 @@ int main( void )
         //*************************************************
         glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP_Hammer[0][0]);
         glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix_Hammer[0][0]);
-		glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
+        glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, Texture_Hammer);
 
         glUniform1i(TextureID, 0);
 
-		// 1rst attribute buffer : vertices
-		glEnableVertexAttribArray(vertexPosition_modelspaceID);
+        // 1rst attribute buffer : vertices
+        glEnableVertexAttribArray(vertexPosition_modelspaceID);
         glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer_hammer);
-		glVertexAttribPointer(
-			vertexPosition_modelspaceID,  // The attribute we want to configure
-			3,                            // size
-			GL_FLOAT,                     // type
-			GL_FALSE,                     // normalized?
+
+        glVertexAttribPointer(
+            vertexPosition_modelspaceID,  // The attribute we want to configure
+            3,                            // size
+            GL_FLOAT,                     // type
+            GL_FALSE,                     // normalized?
             0,                            // stride
-			(void*)0                      // array buffer offset
-		);
+            (void*)0                      // array buffer offset
+        );
 
-		// 2nd attribute buffer : UVs
-		glEnableVertexAttribArray(vertexUVID);
+        // 2nd attribute buffer : UVs
+        glEnableVertexAttribArray(vertexUVID);
+
         glBindBuffer(GL_ARRAY_BUFFER, uvbuffer_hammer);
-		glVertexAttribPointer(
-			vertexUVID,                   // The attribute we want to configure
-			2,                            // size : U+V => 2
-			GL_FLOAT,                     // type
-			GL_FALSE,                     // normalized?
-			0,                            // stride
-			(void*)0                      // array buffer offset
-		);
+        glVertexAttribPointer(
+            vertexUVID,                   // The attribute we want to configure
+            2,                            // size : U+V => 2
+            GL_FLOAT,                     // type
+            GL_FALSE,                     // normalized?
+            0,                            // stride
+            (void*)0                      // array buffer offset
+        );
 
-		// 3rd attribute buffer : normals
-		glEnableVertexAttribArray(vertexNormal_modelspaceID);
+        // 3rd attribute buffer : normals
+        glEnableVertexAttribArray(vertexNormal_modelspaceID);
         glBindBuffer(GL_ARRAY_BUFFER, normalbuffer_hammer);
-		glVertexAttribPointer(
-			vertexNormal_modelspaceID,    // The attribute we want to configure
-			3,                            // size
-			GL_FLOAT,                     // type
-			GL_FALSE,                     // normalized?
-			0,                            // stride
-			(void*)0                      // array buffer offset
-		);
+        glVertexAttribPointer(
+            vertexNormal_modelspaceID,    // The attribute we want to configure
+            3,                            // size
+            GL_FLOAT,                     // type
+            GL_FALSE,                     // normalized?
+            0,                            // stride
+            (void*)0                      // array buffer offset
+        );
 
         glDrawArrays(GL_TRIANGLES, 0, vertices_hammer.size() );
 
-		glDisableVertexAttribArray(vertexPosition_modelspaceID);
-		glDisableVertexAttribArray(vertexUVID);
-		glDisableVertexAttribArray(vertexNormal_modelspaceID);
+        glDisableVertexAttribArray(vertexPosition_modelspaceID);
+        glDisableVertexAttribArray(vertexUVID);
+        glDisableVertexAttribArray(vertexNormal_modelspaceID);
 
         //***************************
 
-		// Swap buffers
+        // Swap buffers
         glfwSwapBuffers();
-	} // Check if the ESC key was pressed or the window was closed
-	while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS &&
-		   glfwGetWindowParam( GLFW_OPENED ) );
 
-	// Cleanup VBO and shader
+    } // Check if the ESC key was pressed or the window was closed
+    while( glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS &&
+           glfwGetWindowParam( GLFW_OPENED ) );
+
+
+    // Cleanup VBO and shader
     glDeleteProgram(programID);
 
     //Clean up hammer
@@ -527,9 +562,8 @@ int main( void )
     glDeleteBuffers(1, &normalbuffer_hammer);
     glDeleteTextures(1, &Texture_Hammer);
 
-	// Close OpenGL window and terminate GLFW
-	glfwTerminate();
+    // Close OpenGL window and terminate GLFW
+    glfwTerminate();
 
-	return 0;
+    return 0;
 }
-
