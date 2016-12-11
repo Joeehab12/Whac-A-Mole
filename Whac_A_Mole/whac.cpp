@@ -247,6 +247,25 @@ int main( void )
 
 	std::vector<Mole> moles(9, Mole(m1));
 
+	//	0	1	2
+	//	O	O	O
+
+	//	3	4	5
+	//	O	O	O
+
+	//	6	7	8
+	//	O	O	O
+
+	moles[0].x = -3.5, moles[0].y = 2, moles[0].z = -12.5;
+	moles[1].x = 0, moles[1].y = 2, moles[1].z = -12.5;
+	moles[2].x = 3.5, moles[2].y = 2, moles[2].z = -12.5;
+	moles[3].x = -3.5, moles[3].y = 2, moles[3].z -9;
+	moles[4].x = 0, moles[4].y = 2, moles[4].z = -9;
+	moles[5].x = 3.5, moles[5].y = 2, moles[5].z = -9;
+	moles[6].x = -3.5, moles[6].y = 2, moles[6].z = -5.5;
+	moles[7].x = 0, moles[7].y = 2, moles[7].z = -5.5;
+	moles[8].x = 3.5, moles[8].y = 2, moles[8].z = -5.5;
+
 	bool flag = true;
 
     do{
@@ -325,16 +344,7 @@ int main( void )
         glDisableVertexAttribArray(vertexUVID);
         glDisableVertexAttribArray(vertexNormal_modelspaceID);
 
-        //***************************
-
-		//	0	1	2
-		//	O	O	O
-
-		//	3	4	5
-		//	O	O	O
-		
-		//	6	7	8
-		//	O	O	O
+        //***************************		
 
 		// hit = 0 --> mole doesn't exist
 		// hit = 1 --> mole exists and not hit
@@ -346,7 +356,7 @@ int main( void )
 			{
 				glm::mat4 TranslationMatrix_Mole;
 
-				if (i == 0)
+				/*if (i == 0)
 				{
 					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x - 3.5f, moles[i].y, moles[i].z - 3.5f));
 				}
@@ -381,8 +391,9 @@ int main( void )
 				else
 				{
 					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x + 3.5f, 2.0f, moles[i].z + 3.5f));
-				}
+				}*/
 
+				TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x, moles[i].y, moles[i].z));
 				glm::mat4 RotationMatrix_Mole = eulerAngleYXZ(0.0f, 0.0f, 0.0f);
 				glm::mat4 ScalingMatrix_Mole = scale(mat4(), vec3(1.5f, 1.5f, 1.5f));
 				glm::mat4 ModelMatrix_Mole = TranslationMatrix_Mole * RotationMatrix_Mole * ScalingMatrix_Mole;
@@ -573,7 +584,7 @@ int main( void )
             RotationMatrix_Hammer = eulerAngleYXZ(-0.5f, 0.0f, 1.5f);
             TranslationMatrix_Hammer = translate(mat4(), vec3(h.x, h.y, h.z));
 
-			if ((h.y - 2.2 <= moles[4].y && (h.x - 4 <= moles[4].x + 1.75 && h.x - 4 >= moles[4].x - 1.75) && (h.z + 6 <= 1.5 && h.z + 6 >= -2.1)) && flag)
+			if ((h.y - 3.2 <= moles[4].y && (h.x - 4 <= moles[4].x + 1.75 && h.x - 4 >= moles[4].x - 1.75) && (h.z + 6 <= 1.5 && h.z + 6 >= -2.1)) && flag)
 			{
 				moles[4].y = -10;
 			}
