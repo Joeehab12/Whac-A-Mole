@@ -26,7 +26,7 @@ float horizontalAngle = 3.14f;
 // Initial vertical angle : none
 float verticalAngle = 0.0f;
 // Initial Field of View
-float initialFoV = 45.0f;
+float initialFoV = 50.0f;
 
 float speed = 3.0f; // 3 units / second
 float mouseSpeed = 0.005f;
@@ -87,7 +87,8 @@ void computeMatricesFromInputs(){
         position -= right * deltaTime * speed;
     }
 
-	float FoV = initialFoV - 5 * glfwGetMouseWheel();
+	//float FoV = initialFoV - 5 * glfwGetMouseWheel();
+	float FoV = initialFoV;
 
 	// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 	ProjectionMatrix = glm::perspective(FoV, 4.0f / 3.0f, 0.1f, 100.0f);
