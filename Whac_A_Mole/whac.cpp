@@ -1,7 +1,9 @@
 // Include standard headers
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <time.h>       /* time */
 
 // Include GLEW
 #include <GL/glew.h>
@@ -16,7 +18,6 @@
 #include <glm/gtx/norm.hpp>//rotation
 using namespace glm;
 
-#include <external\bullet-2.81-rev2613\src\btBulletDynamicsCommon.h>
 #include <common/shader.hpp>
 #include <common/texture.hpp>
 #include <common/controls.hpp>
@@ -25,20 +26,20 @@ using namespace glm;
 
 struct Mole
 {
-	int type;
-	int hit;
-	float x;
-	float y;
-	float z;
+    int type;
+    int hit;
+    float x;
+    float y;
+    float z;
 };
 
 struct Hammer
 {
-	int type;
-	int hit;
-	float x;
-	float y;
-	float z;
+    int type;
+    int hit;
+    float x;
+    float y;
+    float z;
 };
 
 int main( void )
@@ -236,38 +237,57 @@ int main( void )
     glUseProgram(programID);
     GLuint LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
 
-	Mole m1;
-	Hammer h;
+    Mole m1;
+    Hammer h;
 
-	m1.hit = 1;
-	m1.type = 0;
-	m1.x = 0;
-	m1.y = 2;
-	m1.z = -9;
+    m1.hit = 0;
+    m1.type = 0;
+    m1.x = 0;
+    m1.y = 2;
+    m1.z = -9;
 
-	std::vector<Mole> moles(9, Mole(m1));
+    std::vector<Mole> moles(9, Mole(m1));
 
-	//	0	1	2
-	//	O	O	O
+    //	0	1	2
+    //	O	O	O
 
-	//	3	4	5
-	//	O	O	O
+    //	3	4	5
+    //	O	O	O
 
-	//	6	7	8
-	//	O	O	O
+    //	6	7	8
+    //	O	O	O
 
-	moles[0].x = -3.5, moles[0].y = 2, moles[0].z = -12.5;
-	moles[1].x = 0, moles[1].y = 2, moles[1].z = -12.5;
-	moles[2].x = 3.5, moles[2].y = 2, moles[2].z = -12.5;
-	moles[3].x = -3.5, moles[3].y = 2, moles[3].z -9;
-	moles[4].x = 0, moles[4].y = 2, moles[4].z = -9;
-	moles[5].x = 3.5, moles[5].y = 2, moles[5].z = -9;
-	moles[6].x = -3.5, moles[6].y = 2, moles[6].z = -5.5;
-	moles[7].x = 0, moles[7].y = 2, moles[7].z = -5.5;
-	moles[8].x = 3.5, moles[8].y = 2, moles[8].z = -5.5;
+    moles[0].x = -3.5, moles[0].y = 2, moles[0].z = -12.5;
+    moles[1].x = 0, moles[1].y = 2, moles[1].z = -12.5;
+    moles[2].x = 3.5, moles[2].y = 2, moles[2].z = -12.5;
+    moles[3].x = -3.5, moles[3].y = 2, moles[3].z -9;
+    moles[4].x = 0, moles[4].y = 2, moles[4].z = -9;
+    moles[5].x = 3.5, moles[5].y = 2, moles[5].z = -9;
+    moles[6].x = -3.5, moles[6].y = 2, moles[6].z = -5.5;
+    moles[7].x = 0, moles[7].y = 2, moles[7].z = -5.5;
+    moles[8].x = 3.5, moles[8].y = 2, moles[8].z = -5.5;
 
-	bool flag = true;
+    bool flag = true;
+    //Generation of Random Numbers to represent mole locations and mole types
+    //************
+    srand(time(NULL));
+    static double currentTime = glfwGetTime();
 
+
+    int mole_pos1 = rand() % 9;
+    int mole_pos2 = rand() % 9;
+
+
+    int mole_type = rand() % 2;
+
+    int score = 500;
+    int threshold1 = 100;
+    int threshold2 = 500;
+
+    moles[mole_pos1].hit = 1;
+    //moles[mole_pos2].hit = 1;
+    double mole_speed = 0.8;
+    //*************
     do{
 
         // Clear the screen
@@ -344,142 +364,188 @@ int main( void )
         glDisableVertexAttribArray(vertexUVID);
         glDisableVertexAttribArray(vertexNormal_modelspaceID);
 
-        //***************************		
+        //***************************
 
-		// hit = 0 --> mole doesn't exist
-		// hit = 1 --> mole exists and not hit
-		// hit = 2 --> mole exists and hit
+        // hit = 0 --> mole doesn't exist
+        // hit = 1 --> mole exists and not hit
+        // hit = 2 --> mole exists and hit
 
-		for (int i = 0; i < 9; i++)
-		{
-			if (moles[i].hit == 1)
-			{
-				glm::mat4 TranslationMatrix_Mole;
+       // Logic for appearing and disappearing of moles
+       //****************************
+       double lastTime = glfwGetTime();
+        if (score <= threshold2){
+            moles[mole_pos2].hit = 1;
+        }
+        if (lastTime - currentTime > mole_speed){  // if mole appears for (mole_speed) sec.
+            currentTime = glfwGetTime();          // reset currentTime
+            moles[mole_pos1].hit=0;
+            mole_pos1 = rand() % 9;
+            moles[mole_pos1].hit=1;
 
-				/*if (i == 0)
-				{
-					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x - 3.5f, moles[i].y, moles[i].z - 3.5f));
-				}
-				else if (i == 1)
-				{
-					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x, 2.0f, moles[i].z - 3.5f));
-				}
-				else if (i == 2)
-				{
-					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x + 3.5f, 2.0f, moles[i].z - 3.5f));
-				}
-				else if (i == 3)
-				{
-					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x - 3.5f, 2.0f, moles[i].z));
-				}
-				else if (i == 4)
-				{
-					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x, moles[i].y, moles[i].z));
-				}
-				else if (i == 5)
-				{
-					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x + 3.5f, 2.0f, moles[i].z));
-				}
-				else if (i == 6)
-				{
-					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x - 3.5f, 2.0f, moles[i].z + 3.5f));
-				}
-				else if (i == 7)
-				{
-					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x, 2.0f, moles[i].z + 3.5f));
-				}
-				else
-				{
-					TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x + 3.5f, 2.0f, moles[i].z + 3.5f));
-				}*/
+            if(score <= threshold1){
+                if(mole_type == 0){
+                    moles[mole_pos1].type=0;
+                }
+                else{
+                    moles[mole_pos1].type=1;
+                }
+                mole_type = rand() % 2;
+            }
+            else if (score <= threshold2){
+                moles[mole_pos2].hit = 0;
+                mole_pos2 = rand() % 9;
+                moles[mole_pos2].hit = 1;
+                if(mole_type == 0){
+                    moles[mole_pos2].type=0;
+                }
+                else{
+                    moles[mole_pos2].type=1;
+                }
+                mole_type = rand() % 2;
+            }
+            else {
+                moles[mole_pos2].hit = 0;
+                mole_pos2 = rand() % 9;
+                moles[mole_pos2].hit = 1;
+                if(mole_type == 0){
+                    moles[mole_pos2].type=0;
+                }
+                else{
+                    moles[mole_pos2].type=1;
+                }
+                mole_type = rand() % 2;
+                mole_speed = 0.5;
+            }
+        }
 
-				TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x, moles[i].y, moles[i].z));
-				glm::mat4 RotationMatrix_Mole = eulerAngleYXZ(0.0f, 0.0f, 0.0f);
-				glm::mat4 ScalingMatrix_Mole = scale(mat4(), vec3(1.5f, 1.5f, 1.5f));
-				glm::mat4 ModelMatrix_Mole = TranslationMatrix_Mole * RotationMatrix_Mole * ScalingMatrix_Mole;
+        //*********************************
 
-				glm::mat4 MVP_Mole = ProjectionMatrix * ViewMatrix * ModelMatrix_Mole;
 
-				glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP_Mole[0][0]);
-				glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix_Mole[0][0]);
-				glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
+        for (int i = 0; i < 9; i++)
+        {
+            if (moles[i].hit == 1)
+            {
+                glm::mat4 TranslationMatrix_Mole;
 
-				glActiveTexture(GL_TEXTURE0);
+                /*if (i == 0)
+                {
+                    TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x - 3.5f, moles[i].y, moles[i].z - 3.5f));
+                }
+                else if (i == 1)
+                {
+                    TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x, 2.0f, moles[i].z - 3.5f));
+                }
+                else if (i == 2)
+                {
+                    TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x + 3.5f, 2.0f, moles[i].z - 3.5f));
+                }
+                else if (i == 3)
+                {
+                    TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x - 3.5f, 2.0f, moles[i].z));
+                }
+                else if (i == 4)
+                {
+                    TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x, moles[i].y, moles[i].z));
+                }
+                else if (i == 5)
+                {
+                    TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x + 3.5f, 2.0f, moles[i].z));
+                }
+                else if (i == 6)
+                {
+                    TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x - 3.5f, 2.0f, moles[i].z + 3.5f));
+                }
+                else if (i == 7)
+                {
+                    TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x, 2.0f, moles[i].z + 3.5f));
+                }
+                else
+                {
+                    TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x + 3.5f, 2.0f, moles[i].z + 3.5f));
+                }*/
 
-				if (moles[i].type == 0)
-					glBindTexture(GL_TEXTURE_2D, Texture_Mole);
-				else
-					glBindTexture(GL_TEXTURE_2D, Texture_evilMole);
+                TranslationMatrix_Mole = translate(mat4(), vec3(moles[i].x, moles[i].y, moles[i].z));
+                glm::mat4 RotationMatrix_Mole = eulerAngleYXZ(0.0f, 0.0f, 0.0f);
+                glm::mat4 ScalingMatrix_Mole = scale(mat4(), vec3(1.5f, 1.5f, 1.5f));
+                glm::mat4 ModelMatrix_Mole = TranslationMatrix_Mole * RotationMatrix_Mole * ScalingMatrix_Mole;
 
-				glUniform1i(TextureID, 0);
+                glm::mat4 MVP_Mole = ProjectionMatrix * ViewMatrix * ModelMatrix_Mole;
 
-				// 1rst attribute buffer : vertices
-				glEnableVertexAttribArray(vertexPosition_modelspaceID);
-				glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer_mole);
-				glVertexAttribPointer(
-					vertexPosition_modelspaceID,  // The attribute we want to configure
-					3,                            // size
-					GL_FLOAT,                     // type
-					GL_FALSE,                     // normalized?
-					0,                            // stride
-					(void*)0                      // array buffer offset
-					);
+                glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP_Mole[0][0]);
+                glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix_Mole[0][0]);
+                glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
 
-				// 2nd attribute buffer : UVs
-				glEnableVertexAttribArray(vertexUVID);
-				glBindBuffer(GL_ARRAY_BUFFER, uvbuffer_mole);
-				glVertexAttribPointer(
-					vertexUVID,                   // The attribute we want to configure
-					2,                            // size : U+V => 2
-					GL_FLOAT,                     // type
-					GL_FALSE,                     // normalized?
-					0,                            // stride
-					(void*)0                      // array buffer offset
-					);
+                glActiveTexture(GL_TEXTURE0);
 
-				// 3rd attribute buffer : normals
-				glEnableVertexAttribArray(vertexNormal_modelspaceID);
-				glBindBuffer(GL_ARRAY_BUFFER, normalbuffer_mole);
-				glVertexAttribPointer(
-					vertexNormal_modelspaceID,    // The attribute we want to configure
-					3,                            // size
-					GL_FLOAT,                     // type
-					GL_FALSE,                     // normalized?
-					0,                            // stride
-					(void*)0                      // array buffer offset
-					);
+                if (moles[i].type == 0)
+                    glBindTexture(GL_TEXTURE_2D, Texture_Mole);
+                else
+                    glBindTexture(GL_TEXTURE_2D, Texture_evilMole);
 
-				glDrawArrays(GL_TRIANGLES, 0, vertices_mole.size());
+                glUniform1i(TextureID, 0);
 
-				glDisableVertexAttribArray(vertexPosition_modelspaceID);
-				glDisableVertexAttribArray(vertexUVID);
-				glDisableVertexAttribArray(vertexNormal_modelspaceID);
-			}
-		}
+                // 1rst attribute buffer : vertices
+                glEnableVertexAttribArray(vertexPosition_modelspaceID);
+                glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer_mole);
+                glVertexAttribPointer(
+                    vertexPosition_modelspaceID,  // The attribute we want to configure
+                    3,                            // size
+                    GL_FLOAT,                     // type
+                    GL_FALSE,                     // normalized?
+                    0,                            // stride
+                    (void*)0                      // array buffer offset
+                    );
 
-        
+                // 2nd attribute buffer : UVs
+                glEnableVertexAttribArray(vertexUVID);
+                glBindBuffer(GL_ARRAY_BUFFER, uvbuffer_mole);
+                glVertexAttribPointer(
+                    vertexUVID,                   // The attribute we want to configure
+                    2,                            // size : U+V => 2
+                    GL_FLOAT,                     // type
+                    GL_FALSE,                     // normalized?
+                    0,                            // stride
+                    (void*)0                      // array buffer offset
+                    );
+
+                // 3rd attribute buffer : normals
+                glEnableVertexAttribArray(vertexNormal_modelspaceID);
+                glBindBuffer(GL_ARRAY_BUFFER, normalbuffer_mole);
+                glVertexAttribPointer(
+                    vertexNormal_modelspaceID,    // The attribute we want to configure
+                    3,                            // size
+                    GL_FLOAT,                     // type
+                    GL_FALSE,                     // normalized?
+                    0,                            // stride
+                    (void*)0                      // array buffer offset
+                    );
+
+                glDrawArrays(GL_TRIANGLES, 0, vertices_mole.size());
+
+                glDisableVertexAttribArray(vertexPosition_modelspaceID);
+                glDisableVertexAttribArray(vertexUVID);
+                glDisableVertexAttribArray(vertexNormal_modelspaceID);
+            }
+        }
+
+
 
         //***************************
-		
+
   //      // MVP & drawing for Evil Mole
   //      //***************************
   /*
   //      glm::mat4 RotationMatrix_evilMole= eulerAngleYXZ(0.0f, 0.0f,0.0f);
-		//glm::mat4 TranslationMatrix_evilMole = translate(mat4(), vec3(m2.x, m2.y, m2.z));
+        //glm::mat4 TranslationMatrix_evilMole = translate(mat4(), vec3(m2.x, m2.y, m2.z));
   //      glm::mat4 ScalingMatrix_evilMole = scale(mat4(), vec3(0.014f, 0.014f, 0.014f));
   //      glm::mat4 ModelMatrix_evilMole = TranslationMatrix_evilMole * RotationMatrix_evilMole * ScalingMatrix_evilMole;
-
   //      glm::mat4 MVP_evilMole = ProjectionMatrix * ViewMatrix * ModelMatrix_evilMole;
-
   //      glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP_evilMole[0][0]);
   //      glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix_evilMole[0][0]);
   //      glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &ViewMatrix[0][0]);
-
   //      glActiveTexture(GL_TEXTURE0);
   //      glBindTexture(GL_TEXTURE_2D, Texture_evilMole);
-
   //      glUniform1i(TextureID, 0);
-
   //      // 1rst attribute buffer : vertices
   //      glEnableVertexAttribArray(vertexPosition_modelspaceID);
   //      glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer_evilMole);
@@ -491,7 +557,6 @@ int main( void )
   //          0,                            // stride
   //          (void*)0                      // array buffer offset
   //      );
-
   //      // 2nd attribute buffer : UVs
   //      glEnableVertexAttribArray(vertexUVID);
   //      glBindBuffer(GL_ARRAY_BUFFER, uvbuffer_evilMole);
@@ -503,7 +568,6 @@ int main( void )
   //          0,                            // stride
   //          (void*)0                      // array buffer offset
   //      );
-
   //      // 3rd attribute buffer : normals
   //      glEnableVertexAttribArray(vertexNormal_modelspaceID);
   //      glBindBuffer(GL_ARRAY_BUFFER, normalbuffer_evilMole);
@@ -515,13 +579,10 @@ int main( void )
   //          0,                            // stride
   //          (void*)0                      // array buffer offset
   //      );
-
   //      glDrawArrays(GL_TRIANGLES, 0, vertices_evilMole.size() );
-
   //      glDisableVertexAttribArray(vertexPosition_modelspaceID);
   //      glDisableVertexAttribArray(vertexUVID);
   //      glDisableVertexAttribArray(vertexNormal_modelspaceID);
-
   //      //***************************
   */
         // MVP & drawing for hammer
@@ -564,9 +625,9 @@ int main( void )
             glfwSetMousePos(xpos,768/2-yhammer/mouseSpeed);
         }
 
-		h.x = 4.0f - xhammer;
-		h.y = 4.0f;
-		h.z = -6.0f - yhammer;
+        h.x = 4.0f - xhammer;
+        h.y = 4.0f;
+        h.z = -6.0f - yhammer;
 
         glm::mat4 TranslationMatrix_Hammer = translate(mat4(), vec3(h.x, h.y, h.z));
 
@@ -580,23 +641,36 @@ int main( void )
         if (glfwGetMouseButton(GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         {
 
-			h.y += 1.2f;
+            h.y += 1.2f;
             RotationMatrix_Hammer = eulerAngleYXZ(-0.5f, 0.0f, 1.5f);
             TranslationMatrix_Hammer = translate(mat4(), vec3(h.x, h.y, h.z));
 
-			if ((h.y - 3.2 <= moles[4].y && (h.x - 4 <= moles[4].x + 1.75 && h.x - 4 >= moles[4].x - 1.75) && (h.z + 6 <= 1.5 && h.z + 6 >= -2.1)) && flag)
-			{
-				moles[4].y = -10;
-			}
+//            if ((h.y - 3.2 <= moles[4].y && (h.x - 4 <= moles[4].x + 1.75 && h.x - 4 >= moles[4].x - 1.75) && (h.z + 6 <= 1.5 && h.z + 6 >= -2.1)) && flag)
+//            {
+//               moles[4].y = -10;
+//            }
 
-			flag = false;
+
+
+
+//            moles[0].x = -3.5, moles[0].y = 2, moles[0].z = -12.5;
+//            moles[1].x = 0, moles[1].y = 2, moles[1].z = -12.5;
+//            moles[2].x = 3.5, moles[2].y = 2, moles[2].z = -12.5;
+//            moles[3].x = -3.5, moles[3].y = 2, moles[3].z -9;
+//            moles[4].x = 0, moles[4].y = 2, moles[4].z = -9;
+//            moles[5].x = 3.5, moles[5].y = 2, moles[5].z = -9;
+//            moles[6].x = -3.5, moles[6].y = 2, moles[6].z = -5.5;
+//            moles[7].x = 0, moles[7].y = 2, moles[7].z = -5.5;
+//            moles[8].x = 3.5, moles[8].y = 2, moles[8].z = -5.5;
+
+            flag = false;
         }
-		else
-		{
-			RotationMatrix_Hammer = eulerAngleYXZ(-0.5f, 0.0f, 1.0f);
-			//moles[4].y = 2;
-			flag = true;
-		}
+        else
+        {
+            RotationMatrix_Hammer = eulerAngleYXZ(-0.5f, 0.0f, 1.0f);
+            //moles[4].y = 2;
+            flag = true;
+        }
 
         // ***************************
 
