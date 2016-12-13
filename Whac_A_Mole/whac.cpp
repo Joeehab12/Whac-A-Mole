@@ -279,7 +279,7 @@ int main(void)
 
 	int mole_type = rand() % 2;
 
-	int hp = 50;
+	int hp = 150;
 	int score = 0;
 	int threshold1 = 100;
 	int threshold2 = 500;
@@ -368,19 +368,19 @@ int main(void)
 		//***************************
 
 		// hit = 0 --> mole doesn't exist
-		// hit = 1 --> mole exists and not hit
-		// hit = 2 --> mole exists and hit
+		// hit = 1 --> mole exists
 
 		// Logic for appearing and disappearing of moles
 		//****************************
 		lastTime = glfwGetTime();
 		
-		if (score >= threshold1 && score <= threshold2)
+		/*if (score >= threshold1 && score <= threshold2)
 		{
 			moles[mole_pos2].hit = 1;
-		}
+		}*/
 
-		if (lastTime - currentTime > mole_speed){  // if mole appears for (mole_speed) sec.
+		if (lastTime - currentTime > mole_speed)
+		{  // if mole appears for (mole_speed) sec.
 			currentTime = glfwGetTime();          // reset currentTime
 			moles[mole_pos1].hit = 0;
 			mole_pos1 = rand() % 9;
@@ -405,6 +405,7 @@ int main(void)
 				{
 					moles[mole_pos2].type = 1;
 				}
+
 				mole_type = rand() % 2;
 			}
 			else 
@@ -563,7 +564,6 @@ int main(void)
 			{
 				if ((h.y - 3.2 <= moles[i].y && (h.x - 4 <= moles[i].x + 1.75 && h.x - 4 >= moles[i].x - 1.75) && (h.z + 6 <= moles[i].z + 10.5 && h.z + 6 >= moles[i].z + 6.9)) && flag)
 				{
-					//moles[i].y = -10;
 					moles[i].hit = 0;
 
 					if (moles[i].type == 0)
