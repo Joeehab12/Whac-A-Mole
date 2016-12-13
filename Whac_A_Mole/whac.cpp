@@ -5,6 +5,8 @@
 #include <vector>
 #include <time.h>       /* time */
 
+#include <common/text2D.hpp>
+
 // Include GLEW
 #include <GL/glew.h>
 
@@ -375,7 +377,8 @@ int main(void)
 		//****************************
 		lastTime = glfwGetTime();
 
-		if (lastTime - currentTime > mole_speed){  // if mole appears for (mole_speed) sec.
+		if (lastTime - currentTime > mole_speed)
+		{  // if mole appears for (mole_speed) sec.
 			currentTime = glfwGetTime();          // reset currentTime
 			moles[mole_pos1].hit = 0;
 			mole_pos1 = rand() % 9;
