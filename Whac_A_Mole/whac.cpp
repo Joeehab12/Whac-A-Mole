@@ -14,6 +14,10 @@
 // Include GLFW
 #include <GL/glfw.h>
 
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alut.h>
+
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -46,8 +50,33 @@ struct Hammer
 	float z;
 };
 
+#define background_music "bg.wav"
+#define hit_sound "hit.wav"
+
 int main(void)
 {
+    ALuint buffer, source, buffer1, source1;
+
+    // Initialize the environment
+    alutInit(0, NULL);
+
+    // Capture errors
+    alGetError();
+
+    // Load pcm data into buffer
+    buffer = alutCreateBufferFromFile(background_music);
+    buffer1 = alutCreateBufferFromFile(hit_sound);
+
+    // Create sound source (use buffer to fill source)
+    alGenSources(1, &source);
+    alSourcei(source, AL_BUFFER, buffer);
+    alGenSources(1, &source1);
+    alSourcei(source1, AL_BUFFER, buffer1);
+
+    // Play
+    alSourcePlay(source);
+    alSourcei(source, AL_LOOPING, 1);
+
 	// Initialise GLFW
 	if (!glfwInit())
 	{
@@ -579,6 +608,7 @@ int main(void)
 			{
                 if (moles[i].hit == 1 && (h.y - 3.2 <= moles[i].y && (h.x - 4 <= moles[i].x + 1.75 && h.x - 4 >= moles[i].x - 1.75) && (h.z + 6 <= moles[i].z + 10.5 && h.z + 6 >= moles[i].z + 6.9)) && flag)
 				{
+                    alSourcePlay(source1);
                     if (moles[i].type == 0)
                     {
                         score += 10;
@@ -714,6 +744,11 @@ int main(void)
 
 	// Cleanup VBO and shader
 	glDeleteProgram(programID);
+    // Clean up sources and buffers
+    alDeleteSources(1, &source);
+    alDeleteBuffers(1, &buffer);
+    alDeleteSources(1, &source1);
+    alDeleteBuffers(1, &buffer1);
 
 	//Clean up hammer
 	glDeleteBuffers(1, &vertexbuffer_hammer);
@@ -723,6 +758,8 @@ int main(void)
 	cleanupText2D();
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
+    // Exit everything
+    alutExit();
 
 	return 0;
 }
