@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <vector>
 #include <time.h>       /* time */
+#include <math.h>
+#include <Windows.h>
 
 #include <common/text2D.hpp>
 
@@ -25,6 +27,7 @@ using namespace glm;
 #include <common/controls.hpp>
 #include <common/objloader.hpp>
 #include <common/vboindexer.hpp>
+#include <common/text2D.hpp>
 
 struct Mole
 {
@@ -281,24 +284,35 @@ int main(void)
 
 	int mole_type = rand() % 2;
 
-	int time_limit = 10;
+	int time_limit = 200;
 	int hp = 50;
-	int score = 500;
+	int score = 0;
 	int threshold1 = 100;
 	int threshold2 = 500;
 
 	moles[mole_pos1].hit = 1;
 	double mole_speed = 1;
 	double lastTime;
-	//*************
-	do{
+	//*** text
+	initText2D("Holstein.tga");
+	char msg1[] = "Score:";
+	char msg2[] = "HP:";
+	char *score_text = (char*)malloc(5);
+	char msg3[] = ("You win with score:");
+	char msg4[] = ("You lose with score:");
+	char *hp_text = (char*)malloc(5);
+	int time = 0;
+	char *time_text = (char*)malloc(5);
+	char msg5[] = ("Time:");
 
+	//*************
+	do {
+		
 		// Clear the screen
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Use our shader
 		glUseProgram(programID);
-
 		glm::vec3 lightPos = glm::vec3(0, 9, -8);
 		glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
@@ -375,8 +389,10 @@ int main(void)
 
 		// Logic for appearing and disappearing of moles
 		//****************************
+		
 		lastTime = glfwGetTime();
 
+		time = (int)lastTime - currentTime2;
 		if (lastTime - currentTime > mole_speed)
 		{  // if mole appears for (mole_speed) sec.
 			currentTime = glfwGetTime();          // reset currentTime
@@ -646,22 +662,43 @@ int main(void)
 		glDisableVertexAttribArray(vertexNormal_modelspaceID);
 
 		//***************************
+		itoa(score, score_text, 10);
+		itoa(hp, hp_text, 10);
+		itoa(time, time_text, 10);
+		printText2D(msg1, 602, 570, 20);
+		printText2D(score_text, 730, 570, 20);
+		printText2D(msg2, 10, 570, 20);
+		printText2D(hp_text, 70, 570, 20);
+		printText2D(msg5, 296, 570, 20);
+		printText2D(time_text, 400, 570, 20);
 
-
+	
+		
+		
 		// Swap buffers
 		glfwSwapBuffers();
-
+		
 	} // Check if the ESC key was pressed or the window was closed
 	while (glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS &&
 		glfwGetWindowParam(GLFW_OPENED) && hp && (lastTime - currentTime2 <= time_limit));
+	
 
 	if (hp == 0)
 	{
-		std::cout << "You lose with a final score of " << score << std::endl;
+		//std::cout << "You lose with a score of " << score << std::endl;
+		printText2D(msg4, 70, 80, 25);
+		printText2D(score_text, 570, 80, 25);
+		glfwSwapBuffers();
+		Sleep(1000);
+		
 	}
 	else
 	{
-		std::cout << "You win with a score of " << score << std::endl;
+		//std::cout << "You win with a score of " << score << std::endl;
+		printText2D(msg3, 70, 80, 25);
+		printText2D(score_text, 550, 80, 25);
+		glfwSwapBuffers();
+		Sleep(1000);
 	}
 
 	// Cleanup VBO and shader
@@ -672,7 +709,7 @@ int main(void)
 	glDeleteBuffers(1, &uvbuffer_hammer);
 	glDeleteBuffers(1, &normalbuffer_hammer);
 	glDeleteTextures(1, &Texture_Hammer);
-
+	cleanupText2D();
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
 
