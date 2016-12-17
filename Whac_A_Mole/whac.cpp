@@ -14,10 +14,6 @@
 // Include GLFW
 #include <GL/glfw.h>
 
-#include <AL/al.h>
-#include <AL/alc.h>
-#include <AL/alut.h>
-
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -52,12 +48,6 @@ struct Hammer
 
 int main(void)
 {
-    ALuint buffer, source;
-    ALuint state;
-
-    // Initialize the environment
-        alutInit(0, NULL);
-
 	// Initialise GLFW
 	if (!glfwInit())
 	{
