@@ -53,6 +53,8 @@ add_executable(Whac_A_Mole
 	common/texture.hpp
 	common/objloader.cpp
 	common/objloader.hpp
+	common/text2D.cpp
+	common/text2D.hpp
 )
 target_link_libraries(Whac_A_Mole
 	${ALL_LIBS}
