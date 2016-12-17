@@ -14,6 +14,10 @@
 // Include GLFW
 #include <GL/glfw.h>
 
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alut.h>
+
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -48,6 +52,12 @@ struct Hammer
 
 int main(void)
 {
+    ALuint buffer, source;
+    ALuint state;
+
+    // Initialize the environment
+        alutInit(0, NULL);
+
 	// Initialise GLFW
 	if (!glfwInit())
 	{
@@ -272,6 +282,7 @@ int main(void)
     moles[8].x = 3.5, moles[8].y = -10, moles[8].z = -5.5;
 
 	bool flag = true;
+    bool flag1 = true;
 
 	//Generation of Random Numbers to represent mole locations and mole types
 	//************
@@ -282,12 +293,13 @@ int main(void)
 	int mole_pos2 = rand() % 9;
 
 	int mole_type = rand() % 2;
-
-	int time_limit = 200;
-	int hp = 50;
+    int ys = 310;
+    int xs = 50;
+    int time_limit = 60;
+    int hp = 50;
 	int score = 0;
 	int threshold1 = 100;
-	int threshold2 = 500;
+    int threshold2 = 200;
 
 	moles[mole_pos1].hit = 1;
 	double mole_speed = 1;
@@ -663,7 +675,7 @@ int main(void)
 		//***************************
         sprintf(score_text, "%d", score);
         sprintf(hp_text, "%d", hp);
-        sprintf(time_text, "%d", time);
+        sprintf(time_text, "%d", time_limit - time);
         printText2D(msg1, 602, 550, 20);
         printText2D(score_text, 730, 550, 20);
         printText2D(msg2, 10, 550, 20);
@@ -671,34 +683,44 @@ int main(void)
         printText2D(msg5, 296, 550, 20);
         printText2D(time_text, 400, 550, 20);
 
-	
-		
+        if (hp == 0)
+        {
+            while(1)
+            {
+                //std::cout << "You lose with a score of " << score << std::endl;
+                printText2D(msg4, 70 + xs, ys, 25);
+                printText2D(score_text, 570 + xs, ys, 25);
+                glfwSwapBuffers();
+
+                if(glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS)
+                {
+                    flag1 = false;
+                    break;
+                }
+            }
+        }
+        else if(lastTime - currentTime2 > time_limit)
+        {
+            while(1)
+            {
+                //std::cout << "You win with a score of " << score << std::endl;
+                printText2D(msg3, 50 + xs, ys, 25);
+                printText2D(score_text, 550 + xs, ys, 25);
+                glfwSwapBuffers();
+
+                if(glfwGetKey(GLFW_KEY_ESC) == GLFW_PRESS)
+                {
+                    flag1 = false;
+                    break;
+                }
+            }
+        }
 		
 		// Swap buffers
 		glfwSwapBuffers();
 		
 	} // Check if the ESC key was pressed or the window was closed
-	while (glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS &&
-		glfwGetWindowParam(GLFW_OPENED) && hp && (lastTime - currentTime2 <= time_limit));
-	
-
-	if (hp == 0)
-	{
-		//std::cout << "You lose with a score of " << score << std::endl;
-		printText2D(msg4, 70, 80, 25);
-		printText2D(score_text, 570, 80, 25);
-		glfwSwapBuffers();
-        sleep(1);
-		
-	}
-	else
-	{
-		//std::cout << "You win with a score of " << score << std::endl;
-		printText2D(msg3, 70, 80, 25);
-		printText2D(score_text, 550, 80, 25);
-		glfwSwapBuffers();
-        sleep(1);
-	}
+    while (flag1 && glfwGetKey(GLFW_KEY_ESC) != GLFW_PRESS);
 
 	// Cleanup VBO and shader
 	glDeleteProgram(programID);
