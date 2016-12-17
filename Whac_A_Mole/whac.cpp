@@ -5,10 +5,9 @@
 #include <vector>
 #include <time.h>       /* time */
 #include <math.h>
-#include <Windows.h>
-
+#include <unistd.h>
 #include <common/text2D.hpp>
-
+#include <cstring>
 // Include GLEW
 #include <GL/glew.h>
 
@@ -662,15 +661,15 @@ int main(void)
 		glDisableVertexAttribArray(vertexNormal_modelspaceID);
 
 		//***************************
-		itoa(score, score_text, 10);
-		itoa(hp, hp_text, 10);
-		itoa(time, time_text, 10);
-		printText2D(msg1, 602, 570, 20);
-		printText2D(score_text, 730, 570, 20);
-		printText2D(msg2, 10, 570, 20);
-		printText2D(hp_text, 70, 570, 20);
-		printText2D(msg5, 296, 570, 20);
-		printText2D(time_text, 400, 570, 20);
+        sprintf(score_text, "%d", score);
+        sprintf(hp_text, "%d", hp);
+        sprintf(time_text, "%d", time);
+        printText2D(msg1, 602, 550, 20);
+        printText2D(score_text, 730, 550, 20);
+        printText2D(msg2, 10, 550, 20);
+        printText2D(hp_text, 70, 550, 20);
+        printText2D(msg5, 296, 550, 20);
+        printText2D(time_text, 400, 550, 20);
 
 	
 		
@@ -689,7 +688,7 @@ int main(void)
 		printText2D(msg4, 70, 80, 25);
 		printText2D(score_text, 570, 80, 25);
 		glfwSwapBuffers();
-		Sleep(1000);
+        sleep(1);
 		
 	}
 	else
@@ -698,7 +697,7 @@ int main(void)
 		printText2D(msg3, 70, 80, 25);
 		printText2D(score_text, 550, 80, 25);
 		glfwSwapBuffers();
-		Sleep(1000);
+        sleep(1);
 	}
 
 	// Cleanup VBO and shader
